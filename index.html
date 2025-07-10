@@ -41,18 +41,6 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
-    button {
-      margin-left: 10px;
-      padding: 10px 20px;
-      background-color: #0366d6;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #024ea2;
-    }
     .instructions {
       background: #e7f3ff;
       border-left: 4px solid #0366d6;
@@ -80,7 +68,7 @@
 </div>
 
 <div id="inputArea">
-  <input type="text" id="userInput" placeholder="Digite aqui..." autofocus>
+  <input type="text" id="userInput" placeholder="Digite aqui..." autocomplete="off">
 </div>
 
 <script>
@@ -90,7 +78,9 @@
   let colaboradores = 0;
 
   const input = document.getElementById('userInput');
-  input.addEventListener('keydown', function(e) {
+  input.focus();
+
+  input.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
       e.preventDefault();
       sendMessage();
@@ -99,41 +89,43 @@
 
   function sendMessage() {
     const text = input.value.trim();
-    if (!text) return;
-
+    if (!text) {
+      input.focus();
+      return;
+    }
     addMessage(text, 'user');
     input.value = '';
 
     if (etapa === 1) {
       peso = parseFloat(text.replace(',', '.'));
       if (isNaN(peso) || peso <= 0) {
-        addMessage("⚠️ Por favor, informe um peso válido (número maior que 0).", 'bot');
-        input.focus();
+        addMessage('⚠️ Por favor, informe um peso válido (número maior que 0).', 'bot');
+        resetFocus();
         return;
       }
       etapa = 2;
-      addMessage("Ótimo! Agora informe o <strong>comprimento</strong> em metros (B1).", 'bot');
-      input.focus();
+      addMessage('Ótimo! Agora informe o <strong>comprimento</strong> em metros (B1).', 'bot');
+      resetFocus();
     } else if (etapa === 2) {
       metragem = parseFloat(text.replace(',', '.'));
       if (isNaN(metragem) || metragem <= 0) {
-        addMessage("⚠️ Informe uma metragem válida (número maior que 0).", 'bot');
-        input.focus();
+        addMessage('⚠️ Informe uma metragem válida (número maior que 0).', 'bot');
+        resetFocus();
         return;
       }
       etapa = 3;
-      addMessage("Perfeito! Informe o <strong>número de colaboradores</strong> disponíveis.", 'bot');
-      input.focus();
+      addMessage('Perfeito! Informe o <strong>número de colaboradores</strong> disponíveis.', 'bot');
+      resetFocus();
     } else if (etapa === 3) {
       colaboradores = parseInt(text, 10);
       if (isNaN(colaboradores) || colaboradores <= 0) {
-        addMessage("⚠️ Informe um número válido de colaboradores (inteiro maior que 0).", 'bot');
-        input.focus();
+        addMessage('⚠️ Informe um número válido de colaboradores (inteiro maior que 0).', 'bot');
+        resetFocus();
         return;
       }
       addMessage(`📋 Valores informados: Peso = ${peso.toFixed(2)} kg; Comprimento = ${metragem.toFixed(2)} m; Colaboradores = ${colaboradores}.`, 'bot');
       calcularResultados();
-      input.focus();
+      resetFocus();
     }
   }
 
@@ -147,8 +139,8 @@
     addMessage(`⏳ Prazo Médio de Produção: <strong>${prazo} dias</strong>`, 'bot');
 
     etapa = 1;
-    addMessage("Deseja calcular novamente? Informe o próximo <strong>peso</strong> em kg.", 'bot');
-    input.focus();
+    addMessage('Deseja calcular novamente? Informe o próximo <strong>peso</strong> em kg.', 'bot');
+    resetFocus();
   }
 
   function addMessage(text, sender) {
@@ -158,6 +150,10 @@
     msg.innerHTML = text;
     chat.appendChild(msg);
     chat.scrollTop = chat.scrollHeight;
+  }
+
+  function resetFocus() {
+    setTimeout(() => input.focus(), 100);
   }
 </script>
 
