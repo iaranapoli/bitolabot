@@ -69,9 +69,9 @@
   <div class="instructions">
     <strong>Instruções Rápidas de Uso:</strong>
     <ol>
-      <li>Digite o <strong>peso</strong> em kg (A1) e pressione Enviar.</li>
-      <li>Digite o <strong>comprimento</strong> em metros (B1) e pressione Enviar.</li>
-      <li>Digite o <strong>número de colaboradores</strong> e pressione Enviar.</li>
+      <li>Digite o <strong>peso</strong> em kg (A1) e pressione Enter.</li>
+      <li>Digite o <strong>comprimento</strong> em metros (B1) e pressione Enter.</li>
+      <li>Digite o <strong>número de colaboradores</strong> e pressione Enter.</li>
       <li>Aguarde o cálculo de <em>Bitola Média</em> e <em>Prazo Médio de Produção</em>.</li>
       <li>Para novo cálculo, repita a partir do passo 1.</li>
     </ol>
@@ -81,7 +81,6 @@
 
 <div id="inputArea">
   <input type="text" id="userInput" placeholder="Digite aqui..." autofocus>
-  <button onclick="sendMessage()">Enviar</button>
 </div>
 
 <script>
@@ -90,8 +89,15 @@
   let metragem = 0;
   let colaboradores = 0;
 
+  const input = document.getElementById('userInput');
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
   function sendMessage() {
-    const input = document.getElementById('userInput');
     const text = input.value.trim();
     if (!text) return;
 
@@ -102,36 +108,38 @@
       peso = parseFloat(text.replace(',', '.'));
       if (isNaN(peso) || peso <= 0) {
         addMessage("⚠️ Por favor, informe um peso válido (número maior que 0).", 'bot');
+        input.focus();
         return;
       }
       etapa = 2;
       addMessage("Ótimo! Agora informe o <strong>comprimento</strong> em metros (B1).", 'bot');
+      input.focus();
     } else if (etapa === 2) {
       metragem = parseFloat(text.replace(',', '.'));
       if (isNaN(metragem) || metragem <= 0) {
         addMessage("⚠️ Informe uma metragem válida (número maior que 0).", 'bot');
+        input.focus();
         return;
       }
       etapa = 3;
       addMessage("Perfeito! Informe o <strong>número de colaboradores</strong> disponíveis.", 'bot');
+      input.focus();
     } else if (etapa === 3) {
       colaboradores = parseInt(text, 10);
       if (isNaN(colaboradores) || colaboradores <= 0) {
         addMessage("⚠️ Informe um número válido de colaboradores (inteiro maior que 0).", 'bot');
+        input.focus();
         return;
       }
-      // Exibir valores informados
       addMessage(`📋 Valores informados: Peso = ${peso.toFixed(2)} kg; Comprimento = ${metragem.toFixed(2)} m; Colaboradores = ${colaboradores}.`, 'bot');
       calcularResultados();
+      input.focus();
     }
   }
 
   function calcularResultados() {
-    // Cálculo da Bitola Média = sqrt(peso / (metragem * 0.006165))
     const bitolaCalc = Math.sqrt(peso / (metragem * 0.006165));
     const bitola = bitolaCalc.toFixed(2);
-
-    // Cálculo do Prazo Médio de Produção = (peso/3) / (75 * colaboradores)
     const prazoCalc = (peso / 3) / (75 * colaboradores);
     const prazo = prazoCalc.toFixed(2);
 
@@ -140,6 +148,7 @@
 
     etapa = 1;
     addMessage("Deseja calcular novamente? Informe o próximo <strong>peso</strong> em kg.", 'bot');
+    input.focus();
   }
 
   function addMessage(text, sender) {
